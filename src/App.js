@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
-import axios from 'axios'
+import personService from "./services/persons"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -10,17 +10,15 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
-  const hook = () => {
+  useEffect(() => {    
     console.log("effect")
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log("promise fulfilled")
-        setPersons(response.data)
-      })
-  }
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+    })
+  }, [])
 
-  useEffect(hook, [])
   console.log('render', persons.length, 'persons')
 
   const handleNameChange = (event) => setNewName(event.target.value)
@@ -50,10 +48,9 @@ const App = () => {
         alert(`${personObject.number} is already asigned to someone else`)
         setNewNumber('')
       } else {    
-        axios
-          .post('http://localhost:3001/persons', personObject)
-          .then(() => {
-            setPersons(persons.concat(personObject))
+        personService.create(personObject)
+          .then(returnedPerson => {
+            setPersons(persons.concat(returnedPerson))
             setNewName('')
             setNewNumber('')
           })
