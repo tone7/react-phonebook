@@ -33,20 +33,34 @@ const App = () => {
         number: newNumber,
       }
 
+      let existingPerson = {}
+
       if(persons.find(person => {
-        if(person.name === personObject.name) return true
+        if(person.name === personObject.name){
+          existingPerson = person
+          return true
+        }
         
         return false
       })){
-        alert(`${personObject.name} is already added to phonebook`)
-        setNewName('')
-      } else if(persons.find(person => {
-        if(person.number === personObject.number) return true
-
-        return false
-      })){
-        alert(`${personObject.number} is already asigned to someone else`)
-        setNewNumber('')
+        if(existingPerson.number !== personObject.number){
+          if(window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)){
+            personService.update(existingPerson.id, personObject)
+              .then(updatedPerson => {
+                console.log(`Updated person with ID ${updatedPerson.id}: {${updatedPerson.name}, ${updatedPerson.number}}`);
+                const newPersons = [...persons]
+                for(let person of newPersons){
+                  if(person.id === updatedPerson.id){
+                    person.name = updatedPerson.name
+                    person.number = updatedPerson.number
+                  }
+                }
+                setPersons(newPersons)
+                setNewName('')
+                setNewNumber('')
+              })
+          }
+        }
       } else {    
         personService.create(personObject)
           .then(returnedPerson => {
