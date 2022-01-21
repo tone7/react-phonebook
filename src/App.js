@@ -50,11 +50,24 @@ const App = () => {
       } else {    
         personService.create(personObject)
           .then(returnedPerson => {
+            console.log(`Created person with ID ${returnedPerson.id}: {${returnedPerson.name}, ${returnedPerson.number}}`);
             setPersons(persons.concat(returnedPerson))
             setNewName('')
             setNewNumber('')
           })
         }
+    }
+  }
+
+  const removePerson = (personObject) => {
+
+    if(window.confirm(`Do you really want to delete ${personObject.name}?`)){
+      personService.remove(personObject)
+        .then(removedPerson => {
+          const newPersons = persons.filter(person => person.id !== removedPerson.id)
+          console.log(`Removed person with ID ${removedPerson.id}: {${removedPerson.name}, ${removedPerson.number}}`);
+          setPersons(newPersons)
+        })
     }
   }
 
@@ -77,6 +90,7 @@ const App = () => {
       <Persons 
         filter={filter} 
         persons={persons}
+        removePerson={removePerson}
       />
     </div>
   )
