@@ -4,13 +4,6 @@ import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
 import axios from 'axios'
 
-axios
-  .get('http://localhost:3001/persons')
-  .then(response => {
-    const persons = response.data
-    console.log(persons)
-})
-
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
@@ -57,10 +50,14 @@ const App = () => {
         alert(`${personObject.number} is already asigned to someone else`)
         setNewNumber('')
       } else {    
-        setPersons(persons.concat(personObject))
-        setNewName('')
-        setNewNumber('')
-      }
+        axios
+          .post('http://localhost:3001/persons', personObject)
+          .then(() => {
+            setPersons(persons.concat(personObject))
+            setNewName('')
+            setNewNumber('')
+          })
+        }
     }
   }
 
