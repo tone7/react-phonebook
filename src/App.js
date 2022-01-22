@@ -10,7 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [successMessage, setSuccessMessage] = useState(null)
+  const [message, setMessage] = useState(null)
+  const [messageType, setMessageType] = useState('success')
 
   useEffect(() => {    
     console.log("effect")
@@ -58,10 +59,17 @@ const App = () => {
                   }
                 }
                 setPersons(newPersons)
-                setSuccessMessage(`Updated person with ID ${updatedPerson.id}: {${updatedPerson.name}, ${updatedPerson.number}}`)
-                setTimeout(() => setSuccessMessage(null), 5000)
+                setMessage(`Updated person with ID ${updatedPerson.id}: {${updatedPerson.name}, ${updatedPerson.number}}`)
+                setMessageType('success')
+                setTimeout(() => setMessage(null), 5000)
                 setNewName('')
                 setNewNumber('')
+              })
+              .catch(error => {
+                setMessage(`the person '${existingPerson.name}' was already deleted from server`)
+                setMessageType('error')
+                setTimeout(() => setMessage(null), 5000)
+                setPersons(persons.filter(person => person.id !== existingPerson.id))    
               })
           }
         }
@@ -70,10 +78,17 @@ const App = () => {
           .then(returnedPerson => {
             console.log(`Created person with ID ${returnedPerson.id}: {${returnedPerson.name}, ${returnedPerson.number}}`);
             setPersons(persons.concat(returnedPerson))
-            setSuccessMessage(`Created person with ID ${returnedPerson.id}: {${returnedPerson.name}, ${returnedPerson.number}}`)
-            setTimeout(() => setSuccessMessage(null), 5000)
+            setMessage(`Created person with ID ${returnedPerson.id}: {${returnedPerson.name}, ${returnedPerson.number}}`)
+            setMessageType('success')
+            setTimeout(() => setMessage(null), 5000)
             setNewName('')
             setNewNumber('')
+          })
+          .catch(error => {
+            setMessage(`the person '${existingPerson.name}' was already deleted from server`)
+            setMessageType('error')
+            setTimeout(() => setMessage(null), 5000)
+            setPersons(persons.filter(person => person.id !== existingPerson.id))    
           })
         }
     }
@@ -87,6 +102,17 @@ const App = () => {
           const newPersons = persons.filter(person => person.id !== removedPerson.id)
           console.log(`Removed person with ID ${removedPerson.id}: {${removedPerson.name}, ${removedPerson.number}}`);
           setPersons(newPersons)
+          setMessage(`Removed person with ID ${removedPerson.id}: {${removedPerson.name}, ${removedPerson.number}}`)
+          setMessageType('success')
+          setTimeout(() => setMessage(null), 5000)
+          setNewName('')
+          setNewNumber('')
+        })
+        .catch(error => {
+          setMessage(`the person '${personObject.name}' was already deleted from server`)
+          setMessageType('error')
+          setTimeout(() => setMessage(null), 5000)
+          setPersons(persons.filter(person => person.id !== personObject.id))    
         })
     }
   }
@@ -94,7 +120,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successMessage} />
+      <Notification message={message} type={messageType}/>
       <Filter 
         filter={filter} 
         onchange={handleFilterChange}
